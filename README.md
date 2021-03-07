@@ -1,5 +1,5 @@
-# Anti Harassment Bot
-Anti Harassment Bot is meant to discourage use of bad and offensive words in the discord server by first scolding the user for using such words and then giving a kick warning, then finally kicking the user out of the server. This user then cannot enter the server again without discord link.
+# Racis-Hmmmm : NOT ALLOWED
+This Discord Bot is meant to discourage use of bad and offensive words in the discord server by first scolding the user for using such words and then giving a kick warning, then finally kicking the user out of the server. This user then cannot enter the server again without discord link.
 
 
 # How to setup
