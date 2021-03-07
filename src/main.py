@@ -1,0 +1,98 @@
+import sys
+import os
+import discord
+import random
+from trie.Trie import Trie
+from dotenv import load_dotenv
+import json
+
+load_dotenv()
+TOKEN = os.getenv('DISCORD_TOKEN')
+
+client = discord.Client()
+trie = Trie()
+table = {
+    "\"": None,
+    "'": None,
+    "-": None,
+    "`": None,
+    "~": None,
+    ",": None,
+    ".": None,
+    ":": None,
+    ";": None,
+    "_": None
+}
+
+
+def buildTrie():
+    file = open("src/trie/words.txt", 'r')
+
+    for line in file:
+        line = line.strip()
+        trie.insert(line)
+
+
+def punish_user(user_id):
+    user_id = '<@' + str(user_id) + '>'
+    responses = [
+        "Mind your language, {}?",
+        "Hey! Watch your words, {}.",
+        "Come on now, {}. Did you really need to say that?",
+        "{} - LANGUAGE!",
+        "Hey now {}, watch your mouth.",
+        "We don't use that kind of language here, {}."
+    ]
+
+    choice = random.choice(responses)
+    choice = choice.format(user_id)
+
+    return choice
+
+filename = "src/respectspaid.json"
+with open(filename) as f_obj:
+    respects = json.load(f_obj)
+
+def save_respect():
+    with open(filename, "w") as f_obj:
+        json.dump(respects, f_obj, indent=4)
+
+@client.event
+async def on_ready():
+    buildTrie()
+    print("Trie is built. ready to read messages.")
+
+
+@client.event
+async def on_message(message):
+    if message.author.bot:
+        return
+    text = message.content
+    text = text.translate(str.maketrans(table))
+    author_id = message.author.id
+
+    if author_id != 756276859225768057:
+        isClean = True
+        message_word_list = text.split()
+        for word in message_word_list:
+            if trie.search(word):
+                isClean = False
+                break
+        if not isClean:
+            await message.channel.send(punish_user(author_id))
+            curr=str(str(message.guild.id)+"."+str(message.author))
+            if curr not in respects:
+                respects[curr] = 1
+            else:
+                respects[curr] += 1
+            save_respect()
+            if respects[curr] == 4:
+                reply = str("One more offensive word and you would be kicked <@" + str(author_id) + ">")
+                await message.channel.send(reply)
+            if respects[curr] > 4:
+                await message.author.kick()
+                respects.pop(curr)
+                save_respect()
+
+
+client.run(TOKEN)
