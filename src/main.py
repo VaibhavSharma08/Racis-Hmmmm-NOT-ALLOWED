@@ -5,6 +5,8 @@ import random
 from trie.Trie import Trie
 from dotenv import load_dotenv
 import json
+import requests
+import random as r
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -90,6 +92,16 @@ async def on_message(message):
                 reply = str("One more offensive word and you would be kicked <@" + str(author_id) + ">")
                 await message.channel.send(reply)
             if respects[curr] > 4:
+                check=1
+                otp=""
+                for i in range(4):
+                    otp+=str(r.randint(1,9))
+                response = requests.post('https://events-api.notivize.com/applications/7a6f5ffc-85fe-4db3-9795-e8836c0fc791/event_flows/adcd4d1c-2705-46eb-8859-cccb453938a3/events', json = {
+                'author_id': author_id ,
+                'check': 1,
+                'email': 'snaman431@gmail.com',
+                'unique_id': otp
+                })
                 await message.author.kick()
                 respects.pop(curr)
                 save_respect()
